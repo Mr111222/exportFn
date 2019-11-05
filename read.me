@@ -1,0 +1,25 @@
+<button class="btn_exp" v-exports="{datas:tableData, label: tableCol, tableName:tableName}">导出</button>
+导出excel表格  需要下载依赖包
+
+
+
+
+导出pdf
+async pdffn (row) {
+  let orderType = CONTROL_CONSTANTS.getOrderType(row.type)
+  let datas = await this.$http(`/order/detail/${row.id}`)
+  let currentOrder = datas.data.data
+  let filename = '订单信息' + '-' + orderType.text
+  this.$http.post('/order/exportPDF/' + filename, currentOrder.orderItemList, {
+    responseType: `arraybuffer`
+  }).then(res => {
+    const url = window.URL.createObjectURL(new Blob([res.data], {
+      type: `application/octet-stream`
+    }))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${filename}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+  })
+},
